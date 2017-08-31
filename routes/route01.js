@@ -1,13 +1,17 @@
 import express from 'express'
 
-const route01 = express.Router();
+const router = express.Router();
 
-route01.get('/', function(req, res) {
+router.get('/', function(req, res) {
   res.send('Hello from route01.');
 });
 
-route01.get('/users', function(req, res) {
+router.get('/hello', function(req, res) {
+  res.send('Hello again from route01.');
+});
+
+router.get('/users', function(req, res) {
   res.send('List of  users.');
 });
 
-module.exports = route01;
+module.exports = router;
