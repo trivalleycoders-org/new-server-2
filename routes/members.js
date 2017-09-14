@@ -1,19 +1,22 @@
 import express from 'express'
-import connection from '../db'
-
+// import connection from '../db'
+import mysql from 'promise-mysql'
 const router = express.Router();
 
 router.get('/', function(req, res) {
   let sql = "SELECT * FROM members";
-  connection.query(sql, function(err, rows, fields) {
-    if (err) throw err
-
-    var results_json = JSON.stringify(rows);
-
-    console.log('results: ', rows);
-    res.send(results_json);
-  //console.log(connection);
-  //res.send('done')
+  mysql.createConnection({
+    host     : 'localhost',
+    user     : 'root',
+    password : 'karl',
+    database : 'rotary_test'
+  }).then((conn) => {
+    let result = conn.query(sql)
+    conn.end()
+    return result
+  }).then((rows) => {
+    console.log('rows', rows)
+    res.send(rows)
   })
 })
 

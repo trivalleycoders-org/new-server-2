@@ -758,6 +758,10 @@ block-stream@*:
   dependencies:
     inherits "~2.0.0"
 
+bluebird@^3.4.6:
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.5.0.tgz#791420d7f551eea2897453a8a77653f96606d67c"
+
 body-parser@^1.17.1:
   version "1.17.1"
   resolved "https://registry.yarnpkg.com/body-parser/-/body-parser-1.17.1.tgz#75b3bc98ddd6e7e0d8ffe750dfaca5c66993fa47"
@@ -1646,7 +1650,7 @@ ms@0.7.3:
   version "0.7.3"
   resolved "https://registry.yarnpkg.com/ms/-/ms-0.7.3.tgz#708155a5e44e33f5fd0fc53e81d0d40a91be1fff"
 
-mysql@^2.14.1:
+mysql@^2.9.0:
   version "2.14.1"
   resolved "https://registry.yarnpkg.com/mysql/-/mysql-2.14.1.tgz#e9324015e810a50abda94855cab41edfad56284a"
   dependencies:
@@ -1853,6 +1857,13 @@ private@^0.1.6:
 process-nextick-args@~1.0.6:
   version "1.0.7"
   resolved "https://registry.yarnpkg.com/process-nextick-args/-/process-nextick-args-1.0.7.tgz#150e20b756590ad3f91093f25a4f2ad8bff30ba3"
+
+promise-mysql@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/promise-mysql/-/promise-mysql-3.0.2.tgz#356e22511c2fa5193c6a4ef187ccec8e4eab7161"
+  dependencies:
+    bluebird "^3.4.6"
+    mysql "^2.9.0"
 
 proxy-addr@~1.1.3:
   version "1.1.4"
