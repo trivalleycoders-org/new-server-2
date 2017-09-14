@@ -8,7 +8,7 @@ router.get('/', function(req, res) {
   mysql.createConnection({
     host     : 'localhost',
     user     : 'root',
-    password : 'karl',
+    password : '8fh3by',
     database : 'rotary_test'
   }).then((conn) => {
     let result = conn.query(sql)
