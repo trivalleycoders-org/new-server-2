@@ -3,7 +3,7 @@ import connection from '../db'
 
 const router = express.Router();
 
-var sql = "SELECT * FROM members";
+var sql = "SELECT member_id AS _id, firstname, lastname, email FROM members";
 
 router.get('/', function(req, res) {
   connection.query(sql, function (err, rows, fields) {
