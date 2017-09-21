@@ -1,22 +1,48 @@
 import express from 'express'
-import connection from '../db'
-
+// import connection from '../db'
+import mysql from 'promise-mysql'
 const router = express.Router();
 
-var sql = "SELECT member_id AS _id, firstname, lastname, email FROM members";
-
 router.get('/', function(req, res) {
-  connection.query(sql, function (err, rows, fields) {
-    if (err) throw err
-
-    var results_json = JSON.stringify(rows);
-
-    console.log('results: ', rows);
-    res.send(results_json);
-  //console.log(connection);
-  //res.send('done')
+  let sql = "SELECT * FROM members";
+  mysql.createConnection({
+    host     : process.env.DB_HOST,
+    user     : process.env.DB_USER,
+    password : process.env.DB_PASS,
+    database : process.env.DB_NAME
+  }).then((conn) => {
+    let result = conn.query(sql)
+    conn.end()
+    return result
+  }).then((rows) => {
+    console.log('rows', rows)
+    res.send(rows)
   })
-});
+})
+
+router.put('/:id', function(req, res) {
+  // console.log('members/email')
+  // console.log('id', req.params.id)
+  console.log('body', req.body)
+  let _id = req.params.id
+  let newFirst = req.body.member.firstname
+  let newLast = req.body.member.lastname
+  let newEmail = req.body.member.email
+  let sql = `UPDATE members SET firstname = '${newFirst}', lastname = '${newLast}', email = '${newEmail}' WHERE member_id = ${_id}`
+  mysql.createConnection({
+    host     : process.env.DB_HOST,
+    user     : process.env.DB_USER,
+    password : process.env.DB_PASS,
+    database : process.env.DB_NAME
+  }).then((conn) => {
+    let result = conn.query(sql)
+    conn.end()
+    return result
+  }).then((rows) => {
+    console.log('rows', rows)
+    res.send(rows)
+  })
+})
 
 router.get('/hello', function(req, res) {
   res.send('Hello again from route II');

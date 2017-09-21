@@ -1,18 +1,21 @@
-import mysql from 'mysql'
+// import mysql from 'promise-mysql'
+//
+// const connection = mysql.createConnection({
+//   host     : 'localhost',
+//   user     : 'root',
+//   password : 'karl',
+//   database : 'rotary_test'
+// }).then(function(conn) {
+//   console.log(conn)
+//   return conn
+// })
 
-const connection = mysql.createConnection({
-  host     : 'localhost',
-  user     : 'root',
-  password : 'xxxxxx',
-  database : 'rotary_test'
-})
+// connection.connect(function(err) {
+//   if (err) {
+//     console.error('error connecting: ' + err.stack);
+//     return;
+//   }
+//   console.log('connected as id ' + connection.threadId);
+// })
 
-connection.connect(function(err) {
-  if (err) {
-    console.error('error connecting: ' + err.stack);
-    return;
-  }
-  console.log('connected as id ' + connection.threadId);
-})
-
-module.exports = connection
+// module.exports = connection
