@@ -6,6 +6,7 @@ import path from 'path'
 import { db } from './db'
 // import member from './routes/members'
 import members from './routes/members'
+require('dotenv').config()
 
 const app = express()
 

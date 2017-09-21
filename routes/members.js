@@ -6,10 +6,10 @@ const router = express.Router();
 router.get('/', function(req, res) {
   let sql = "SELECT * FROM members";
   mysql.createConnection({
-    host     : 'localhost',
-    user     : 'root',
-    password : '8fh3by',
-    database : 'rotary_test'
+    host     : process.env.DB_HOST,
+    user     : process.env.DB_USER,
+    password : process.env.DB_PASS,
+    database : process.env.DB_NAME
   }).then((conn) => {
     let result = conn.query(sql)
     conn.end()
@@ -23,16 +23,24 @@ router.get('/', function(req, res) {
 router.put('/:id', function(req, res) {
   // console.log('members/email')
   // console.log('id', req.params.id)
-  // console.log('email', req.body.email)
+  console.log('body', req.body)
   let _id = req.params.id
-  let newEmail = req.body.email
-  let sql = `UPDATE members SET email = '${newEmail}' WHERE members._id = ${_id}`
-  console.log('sql', sql)
-  connection.query(sql, function(err, rows, fields) {
-    if (err) throw err
-
+  let newFirst = req.body.member.firstname
+  let newLast = req.body.member.lastname
+  let newEmail = req.body.member.email
+  let sql = `UPDATE members SET firstname = '${newFirst}', lastname = '${newLast}', email = '${newEmail}' WHERE member_id = ${_id}`
+  mysql.createConnection({
+    host     : process.env.DB_HOST,
+    user     : process.env.DB_USER,
+    password : process.env.DB_PASS,
+    database : process.env.DB_NAME
+  }).then((conn) => {
+    let result = conn.query(sql)
+    conn.end()
+    return result
+  }).then((rows) => {
     console.log('rows', rows)
-    res.send('sent query')
+    res.send(rows)
   })
 })
 
