@@ -25,7 +25,7 @@ router.put('/:id', function(req, res) {
   let newFirst = req.body.member.firstname
   let newLast = req.body.member.lastname
   let newEmail = req.body.member.email
-  let sql = `UPDATE members SET firstname = '${newFirst}', lastname = '${newLast}', email = '${newEmail}' WHERE member_id = ${_id}`
+  let sql = `UPDATE members SET first_name = '${newFirst}', last_name = '${newLast}', email = '${newEmail}' WHERE member_id = ${_id}`
   mysql.createConnection({
     host     : process.env.DB_HOST,
     user     : process.env.DB_USER,
