@@ -3,13 +3,21 @@ import express from 'express'
 import mysql from 'promise-mysql'
 const router = express.Router();
 
-router.get('/', function(req, res) {
-  let sql = "SELECT * FROM members";
-  mysql.createConnection({
+const connectConfig = {
     host     : process.env.DB_HOST,
     user     : process.env.DB_USER,
     password : process.env.DB_PASS,
     database : process.env.DB_NAME
+}
+
+router.get('/', function(req, res) {
+  // console.log('connectConfig', connectConfig)
+  let sql = "SELECT * FROM members";
+  mysql.createConnection({
+      host     : process.env.DB_HOST,
+      user     : process.env.DB_USER,
+      password : process.env.DB_PASS,
+      database : process.env.DB_NAME
   }).then((conn) => {
     let result = conn.query(sql)
     conn.end()
@@ -50,7 +58,7 @@ router.put('/:id', function(req, res) {
     if (err) {
       console.log(err)
     }
-    console.log(rows)
+    // console.log(rows)
     res.send(rows)
   })
 })
