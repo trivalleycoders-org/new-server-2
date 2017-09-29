@@ -30,8 +30,8 @@ router.get('/', function(req, res) {
 
 router.put('/:id', function(req, res) {
   let _id = req.params.id
-  let newFirst = req.body.member.firstname
-  let newLast = req.body.member.lastname
+  let newFirst = req.body.member.first_name
+  let newLast = req.body.member.last_name
   let newEmail = req.body.member.email
   let sql = `UPDATE members SET first_name = '${newFirst}', last_name = '${newLast}', email = '${newEmail}' WHERE member_id = ${_id}`
   mysql.createConnection({
