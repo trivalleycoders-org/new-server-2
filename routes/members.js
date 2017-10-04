@@ -29,18 +29,39 @@ router.get('/', function(req, res) {
 })
 
 router.put('/:id', function(req, res) {
-  let _id = req.params.id
-  let newFirst = req.body.member.first_name
-  let newLast = req.body.member.last_name
-  let newEmail = req.body.member.email
-  let sql = `UPDATE members SET first_name = '${newFirst}', last_name = '${newLast}', email = '${newEmail}' WHERE member_id = ${_id}`
+  let updatedMember = req.body.member;
+  // make sure we never update an existing member's member_id
+  ('member_id' in updatedMember) && delete updatedMember.member_id;
+  // the following "placeholder" syntax is explained here: https://www.w3resource.com/node.js/nodejs-mysql.php#Escaping_query
+  let sql = "UPDATE members SET ? WHERE member_id = ?";
   mysql.createConnection({
     host     : process.env.DB_HOST,
     user     : process.env.DB_USER,
     password : process.env.DB_PASS,
     database : process.env.DB_NAME
   }).then((conn) => {
-    let result = conn.query(sql)
+    let result = conn.query(sql, [updatedMember, req.params.id])
+    conn.end()
+    return result
+  }).then((rows) => {
+    console.log('rows', rows)
+    res.send(rows)
+  })
+})
+
+router.post('/', function(req, res) {
+  let newMember = req.body.member;
+  // make sure we're not passing a member_id into the INSERT query
+  ('member_id' in newMember) && delete newMember.member_id;
+  // the following "placeholder" syntax is explained here: https://www.w3resource.com/node.js/nodejs-mysql.php#Escaping_query
+  let sql = "INSERT INTO members SET ?";
+  mysql.createConnection({
+    host     : process.env.DB_HOST,
+    user     : process.env.DB_USER,
+    password : process.env.DB_PASS,
+    database : process.env.DB_NAME
+  }).then((conn) => {
+    let result = conn.query(sql, newMember);
     conn.end()
     return result
   }).then((rows) => {
