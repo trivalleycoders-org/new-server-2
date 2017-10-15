@@ -10,14 +10,18 @@ router.get('/scheduleMembers', function(req, res) {
   // sql += 'limit 12;'
 
   let sql = `
-    SELECT m.member_id, m.first_name, m.last_name, h.history_id, MAX(h.date), h.role_id, r.role_name
+    SELECT m.member_id, m.first_name, m.last_name, h.history_id, h.date, h.role_id, r.role_name
     FROM members m
     LEFT JOIN history h ON h.member_id = m.member_id
     LEFT JOIN roles r ON r.role_id = h.role_id
+      INNER JOIN (
+        SELECT x.member_id, MAX(x.date) as max_date
+        FROM history x
+        GROUP BY x.member_id
+    ) AS y ON m.member_id = y.member_id AND h.date = y.max_date
     WHERE m.exempt = 0
-    GROUP BY m.member_id
     ORDER BY (h.history_id IS NULL) DESC, h.date ASC
-    limit 12;
+    LIMIT 12;
   `
   // console.log('/next6: sql', sql)
   mysql.createConnection({
