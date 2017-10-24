@@ -10,7 +10,7 @@ router.get('/scheduleMembers', function(req, res) {
   // sql += 'limit 12;'
 
   let sql = `
-    SELECT (select (@row:=@row+1) from (select @row := 0) s) as sequence, m.member_id, m.first_name, m.last_name, h.history_id, h.date, h.role_id, r.role_name
+    SELECT (select (@row:=@row+1) FROM (select @row := 0) s) as sequence, m.member_id, m.first_name, m.last_name, h.history_id, h.date, h.role_id, r.role_name, m.comment
     FROM members m
     LEFT JOIN history h ON h.member_id = m.member_id AND (h.date = (SELECT MAX(h1.date) FROM history h1 WHERE h1.member_id = m.member_id))
     LEFT JOIN roles r on r.role_id = h.role_id
