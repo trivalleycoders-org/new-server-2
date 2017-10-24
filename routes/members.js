@@ -3,11 +3,12 @@ import express from 'express'
 import mysql from 'promise-mysql'
 const router = express.Router();
 
+
 const connectConfig = {
     host     : process.env.DB_HOST,
     user     : process.env.DB_USER,
     password : process.env.DB_PASS,
-    database : process.env.DB_NAME
+    database : process.env.DB_NAME,
 }
 
 // create
@@ -40,7 +41,7 @@ router.get('/', function(req, res) {
       host     : process.env.DB_HOST,
       user     : process.env.DB_USER,
       password : process.env.DB_PASS,
-      database : process.env.DB_NAME
+      database : process.env.DB_NAME,
   }).then((conn) => {
     let result = conn.query(sql)
     conn.end()
