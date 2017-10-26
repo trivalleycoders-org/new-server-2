@@ -35,7 +35,7 @@ router.post('/', function(req, res) {
 // read
 router.get('/', function(req, res) {
   // console.log('connectConfig', connectConfig)
-  let sql = "SELECT * FROM members";
+  let sql = "SELECT * FROM members WHERE active != 0";
   mysql.createConnection({
       host     : process.env.DB_HOST,
       user     : process.env.DB_USER,
@@ -51,7 +51,7 @@ router.get('/', function(req, res) {
   })
 })
 
-// update
+// update (handles member information updates, active/inactive swtiching)
 router.put('/:id', function(req, res) {
   let updatedMember = req.body.member;
   // make sure we never update an existing member's member_id
