@@ -28,7 +28,7 @@ router.post('/', function(req, res) {
     conn.end()
     return result
   }).then((rows) => {
-    console.log('rows', rows)
+    // console.log('rows', rows)
     res.send(rows)
   })
 })
@@ -47,7 +47,7 @@ router.get('/', function(req, res) {
     conn.end()
     return result
   }).then((rows) => {
-    console.log('rows', rows)
+    // console.log('rows', rows)
     res.send(rows)
   })
 })
@@ -69,7 +69,7 @@ router.put('/:id', function(req, res) {
     conn.end()
     return result
   }).then((rows) => {
-    console.log('rows', rows)
+    // console.log('rows', rows)
     res.send(rows)
   })
 })
@@ -88,17 +88,9 @@ router.delete('/:id', function(req, res) {
     conn.end()
     return result
   }).then((rows) => {
-    console.log('rows', rows)
+    console.log('rows /n', rows)
     res.send(rows)
   })
 })
-
-router.get('/hello', function(req, res) {
-  res.send('Hello again from route II');
-});
-
-router.get('/users', function(req, res) {
-  res.send('List of  users.');
-});
 
 module.exports = router;
