@@ -105,7 +105,7 @@ router.get('/scheduleMembers', function(req, res) {
     conn.end()
     return result
   }).then((rows) => {
-    console.log('routes.schedule/next6: rows \n', rows)
+    // console.log('routes.schedule/scheduleMembers: rows \n', rows)
     res.send(rows)
   })
 })
@@ -117,7 +117,7 @@ router.get('/roles', function(req, res) {
     conn.end()
     return result
   }).then((rows) => {
-    console.log('routes.schedule/roles: rows \n', rows)
+    // console.log('routes.schedule/roles: rows \n', rows)
     res.send(rows)
   })
 })
@@ -131,7 +131,7 @@ router.get('/exclusions', function(req, res) {
     conn.end()
     return result
   }).then((rows) => {
-    console.log('routes.schedule/exclusions: rows \n', rows)
+    // console.log('routes.schedule/exclusions: rows \n', rows)
     res.send(rows)
   })
 })
