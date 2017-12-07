@@ -20,8 +20,7 @@ router.get('/schedule/:date?', function(req, res, next) {
   }
 
   let schedule = {}, membersByRole = {}
-  let roleIds = [], unassignedRoleIds = []
-  // let scheduledMemberIds = []
+  let roleIds = [], unassignedRoleIds = [], scheduledMemberIds = []
 
   mysql.createConnection(connectionConfig).then((conn) => {
     db = conn
@@ -44,7 +43,7 @@ router.get('/schedule/:date?', function(req, res, next) {
     for (let i = 0; i < rows.length; i++) {
       rid = rows[i]['roleId']
       membersByRole[rid] = rows[i]['memberId']
-      // scheduledMemberIds[i] = rows[i]['memberId']
+      scheduledMemberIds[i] = rows[i]['memberId']
     }
     for (let i = 0; i < roleIds.length; i++) {
       rid = roleIds[i]
@@ -62,10 +61,11 @@ router.get('/schedule/:date?', function(req, res, next) {
         SELECT m.member_id
         FROM members m
         LEFT JOIN history h ON h.member_id = m.member_id AND (h.date = (SELECT MAX(h1.date) FROM history h1 WHERE h1.member_id = m.member_id))
-        WHERE h.date < '${date}' AND m.exempt = 0
+        WHERE m.exempt = 0
         ORDER BY (h.history_id IS NULL) DESC, h.date ASC, m.last_name ASC
-        LIMIT ${roleIds.length - rows.length}
+        LIMIT ${roleIds.length}
       `
+      console.log('fill-in sql: ', sql)
       result = db.query(sql)
     } else {
       result = []
@@ -75,8 +75,13 @@ router.get('/schedule/:date?', function(req, res, next) {
     db.end()
     let rid
     for (let i = 0; i < rows.length; i++) {
-      rid = unassignedRoleIds[i]
-      membersByRole[rid] = rows[i]['member_id']
+      if (scheduledMemberIds.indexOf(rows[i]['member_id']) < 0) {
+        console.log('fill-in member ids:', rows)
+        console.log('fill-in member id:', rows[i]['member_id'])
+        rid = unassignedRoleIds[i]
+        membersByRole[rid] = rows[i]['member_id']
+        break;
+      }
     }
     console.log('membersByRole:', membersByRole)
     res.send(membersByRole)
