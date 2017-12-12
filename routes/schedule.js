@@ -74,13 +74,20 @@ router.get('/schedule/:date?', function(req, res, next) {
   }).then((rows) => {
     db.end()
     let rid
-    for (let i = 0; i < rows.length; i++) {
-      if (scheduledMemberIds.indexOf(rows[i]['member_id']) < 0) {
-        console.log('fill-in member ids:', rows)
-        console.log('fill-in member id:', rows[i]['member_id'])
-        rid = unassignedRoleIds[i]
-        membersByRole[rid] = rows[i]['member_id']
-        break;
+    if (rows.length) {
+      // loop over the unassigned roles
+      for (let i = 0; i < unassignedRoleIds.length; i++) {
+        // find a member not yet assigned to a role
+        for (let j = 0; j < rows.length; j++) {
+          if (scheduledMemberIds.indexOf(rows[j]['member_id']) < 0) {
+            console.log('fill-in member ids:', rows)
+            console.log('fill-in member id:', rows[i]['member_id'])
+            rid = unassignedRoleIds[i]
+            membersByRole[rid] = rows[i]['member_id']
+            scheduledMemberIds.push(rows[i]['member_id'])
+            break;            
+          }
+        }
       }
     }
     console.log('membersByRole:', membersByRole)
