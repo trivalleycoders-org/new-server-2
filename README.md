@@ -206,3 +206,56 @@ SELECT * FROM exclusions
   }
 ]
 ````
+
+
+## Schedule
+### roles []
+````
+[
+  { role_id: 1, role_name: "role01 }
+  { role_id: 2, role_name: "role02 }
+  ...
+]
+````
+### membersByRole {}
+````
+// roleId:memberId
+{
+  '1': 4,
+  '2': 6, 
+  '3': 1, 
+  '4': 2, 
+  '5': 7, 
+  '6': 8 
+}
+````
+### scheduleMemberIds []
+````
+//// index:memberId
+[
+  0: 4
+  1: 3
+]
+````
+// this date does not exist
+roleIds:  [ 1, 2, 3, 4, 5, 6 ]
+unassignedRoleIds:  [ 1, 2, 3, 4, 5, 6 ]
+scheduleMemberIds:  [ 4, 6, 1, 2, 7, 8 ]
+membersByRole: { '1': 4, '2': 6, '3': 1, '4': 2, '5': 7, '6': 8 }
+
+// this date exists
+roleIds:  [ 1, 2, 3, 4, 5, 6 ]
+unassignedRoleIds:  [ 6 ]
+scheduleMemberIds:  [ 7, 8, 1, 2, 3, 4 ]
+membersByRole: { '1': 7, '2': 8, '3': 1, '4': 2, '5': 3, '6': 4 }
+
+1. query roleIds
+2. fill roleIds[]
+3. query schedule (date)
+4. fill membersByRole{} & scheduledMemberIds[]
+5. fill unassignedRoleIds[]
+6. if scheduledMemberIds.count < roleIds.count
+7. query lastServedDate
+
+
+

@@ -19,9 +19,9 @@ router.get('/schedule/:date?', function(req, res, next) {
       date = currentDate.getFullYear() + '-' + currentMonth + '-' + currentDay
   }
 
-  let membersByRole = {}
+  let schedule = {}, membersByRole = {}
   let roleIds = [], unassignedRoleIds = [], scheduledMemberIds = []
-  let numberOfRoles, numberOfRolesFilled
+
   mysql.createConnection(connectionConfig).then((conn) => {
     db = conn
     // first get the roles
@@ -30,8 +30,7 @@ router.get('/schedule/:date?', function(req, res, next) {
     let result = conn.query(sql)
     return result
   }).then((rows) => {
-    numberOfRoles = rows.length
-    for (let i = 0; i < numberOfRoles; i++) {
+    for (let i = 0; i < rows.length; i++) {
       roleIds[i] = rows[i].role_id
     }
 
@@ -41,15 +40,13 @@ router.get('/schedule/:date?', function(req, res, next) {
     let result = db.query(sql)
     return result
   }).then((rows) => {
-    numberOfRolesFilled = rows.length
     let rid
-    for (let i = 0; i < numberOfRolesFilled; i++) {
+    for (let i = 0; i < rows.length; i++) {
       rid = rows[i]['roleId']
       membersByRole[rid] = rows[i]['memberId']
       scheduledMemberIds[i] = rows[i]['memberId']
-      
     }
-    for (let i = 0; i < numberOfRoles; i++) {
+    for (let i = 0; i < roleIds.length; i++) {
       rid = roleIds[i]
       if (!membersByRole[rid]) {
         unassignedRoleIds.push(rid)
@@ -70,6 +67,7 @@ router.get('/schedule/:date?', function(req, res, next) {
         LIMIT ${roleIds.length}
       `
       // console.log('/schedule/:date?: sql', sql)
+      // console.log('fill-in sql: ', sql)
       result = db.query(sql)
     } else {
       result = []
@@ -94,6 +92,7 @@ router.get('/schedule/:date?', function(req, res, next) {
         }
       }
     }
+    console.log('membersByRole:', membersByRole)
     // let tmp = {
     //   a: 1,
     //   b: 2,
@@ -102,22 +101,17 @@ router.get('/schedule/:date?', function(req, res, next) {
     //   e: 5,
     //   f: 6,
     // }
-    // let tmp = {
-    //   '0': 1,
-    //   '1': 2,
-    //   '2': 3,
-    //   '3': 4,
-    //   '4': 5,
-    //   '5': 6,
-    // }
-    // console.log('tmp', tmp)
-    // console.log('schedule: ', schedule)
-    console.log('membersByRole: ', membersByRole)
-    // console.log('roleIds: ', roleIds)
-    // console.log('unassignedRoleIds: ', unassignedRoleIds)
-    // console.log('scheduleMemberIds: ', scheduledMemberIds)
-    res.send(membersByRole)
-    // res.send(tmp)
+    let tmp = {
+      '0': 1,
+      '1': 2,
+      '2': 3,
+      '3': 4,
+      '4': 5,
+      '5': 6,
+    }
+    console.log('tmp', tmp)
+    // res.send(membersByRole)
+    res.send(tmp)
   })
 })
 
