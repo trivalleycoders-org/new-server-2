@@ -6,7 +6,7 @@ const router = express.Router();
 // create
 router.post('/', function(req, res) {
   const m = req.body.member
-  console.log('updated member in:', m)
+  // console.log('updated member in:', m)
   const newMember = {
     first_name: m.firstName,
     last_name: m.lastName,
@@ -16,7 +16,7 @@ router.post('/', function(req, res) {
     phone_number: m.phoneNumber,
     active: m.active,
   }
-  console.log('updated member reformatted:', updatedMember)
+  // console.log('updated member reformatted:', updatedMember)
   // the following "placeholder" syntax is explained here: https://www.w3resource.com/node.js/nodejs-mysql.php#Escaping_query
   let sql = "INSERT INTO members SET ?";
   mysql.createConnection(connectionConfig).then((conn) => {
