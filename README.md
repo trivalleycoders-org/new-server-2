@@ -249,13 +249,20 @@ unassignedRoleIds:  [ 6 ]
 scheduleMemberIds:  [ 7, 8, 1, 2, 3, 4 ]
 membersByRole: { '1': 7, '2': 8, '3': 1, '4': 2, '5': 3, '6': 4 }
 
-1. query roleIds
-2. fill roleIds[]
-3. query schedule (date)
-4. fill membersByRole{} & scheduledMemberIds[]
+1. query roleIds (get all the roleIds)
+2. fill roleIds[] (put them in an array)
+3. query schedule (date) (get the schedule for date)
+4. fill membersByRole{} & scheduledMemberIds[] (fill)
 5. fill unassignedRoleIds[]
 6. if scheduledMemberIds.count < roleIds.count
 7. query lastServedDate
+8. fill in unassigned roles
 
-
-
+// new
+1. getRoles
+2. makeSchedule
+3. getExistingSchedule
+4. fillExistingSchedule
+5. getLastServed
+  5.1 filterByAlreadyScheduled
+6. fillUnassignedInSchedule
