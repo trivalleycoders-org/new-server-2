@@ -1,123 +1,110 @@
 import express from 'express'
 import mysql from 'promise-mysql'
+
 const router = express.Router();
+
 
 // simple schedule -- roleId => memberId pairs
 // if no date, use current date
 // get the six that served on date supplied
 // if no results, return the next six (by last served date)
-router.get('/schedule/:date?', function(req, res, next) {
-  let db
 
-  let date = req.params.date;
+const makeSchedule = (roles) => {
+  let arr = []
+  roles.forEach((role) => {
+    let r = { roleId: role.roleId, roleName: role.roleName, memberId: '' }
+    arr.push(r)
+  })
+  return arr
+}
+
+const fillExistingSchedule = (schedule, existingSchedule) => {
+  schedule.forEach((role) => {
+    let x = existingSchedule.filter((r) => {
+      return r.roleId === role.roleId
+    })
+    if (x.length !== 0) { 
+      role.memberId = x[0].memberId
+    }
+  })
+}
+
+const checkDate = (date) => {
+  let retDate
   if (!date) {
-      let currentDate = new Date()
-      let currentDay = currentDate.getDate()
-      if (currentDay < 10) currentDay = '0' + currentDay
-      let currentMonth = currentDate.getMonth() + 1
-      if (currentMonth < 10) currentMonth = '0' + currentMonth
-      date = currentDate.getFullYear() + '-' + currentMonth + '-' + currentDay
+    let currentDate = new Date()
+    let currentDay = currentDate.getDate()
+    if (currentDay < 10) currentDay = '0' + currentDay
+    let currentMonth = currentDate.getMonth() + 1
+    if (currentMonth < 10) currentMonth = '0' + currentMonth
+    retDate = currentDate.getFullYear() + '-' + currentMonth + '-' + currentDay
+  } else {
+    retDate = date
   }
+  return retDate
+}
 
-  let membersByRole = {}
-  let roleIds = [], unassignedRoleIds = [], scheduledMemberIds = []
-  let numberOfRoles, numberOfRolesFilled
-  mysql.createConnection(connectionConfig).then((conn) => {
-    db = conn
-    // first get the roles
-    let sql = "SELECT role_id FROM roles"
-    // console.log('/schedul/:date?: sql', sql)
-    let result = conn.query(sql)
-    return result
-  }).then((rows) => {
-    numberOfRoles = rows.length
-    for (let i = 0; i < numberOfRoles; i++) {
-      roleIds[i] = rows[i].role_id
-    }
+const sqlGetRoles = "SELECT role_id AS roleId, role_name AS roleName FROM roles"
 
-    // see if there's an existing schedule
-    let sql = "SELECT member_id AS memberId, role_id AS roleId, date FROM history WHERE date = '" + date + "'" // '2017-12-25'
-    // console.log('/schedule/:date?: sql', sql)
-    let result = db.query(sql)
-    return result
-  }).then((rows) => {
-    numberOfRolesFilled = rows.length
-    let rid
-    for (let i = 0; i < numberOfRolesFilled; i++) {
-      rid = rows[i]['roleId']
-      membersByRole[rid] = rows[i]['memberId']
-      scheduledMemberIds[i] = rows[i]['memberId']
-      
-    }
-    for (let i = 0; i < numberOfRoles; i++) {
-      rid = roleIds[i]
-      if (!membersByRole[rid]) {
-        unassignedRoleIds.push(rid)
-      }
-    }
-    // console.log('existing schedule:', membersByRole)
-    // console.log('unassigned roles:', unassignedRoleIds)
-    let result
-    if (rows.length < roleIds.length) {
-      // if there are fewer roles scheduled than there are existing roles,
-      // fill in the schedule with the next eligible members (by last served date)
-      let sql = `
-        SELECT m.member_id
+const sqlGetExistingSchedule = (date) => {
+  return `SELECT member_id AS memberId, role_id AS roleId, date FROM history WHERE date = '${date}'` // '2017-12-25'
+}
+
+const sqlLastServed = (numRows) => {
+  return `
+        SELECT m.member_id AS memberId
         FROM members m
         LEFT JOIN history h ON h.member_id = m.member_id AND (h.date = (SELECT MAX(h1.date) FROM history h1 WHERE h1.member_id = m.member_id))
         WHERE m.exempt = 0
         ORDER BY (h.history_id IS NULL) DESC, h.date ASC, m.last_name ASC
-        LIMIT ${roleIds.length}
+        LIMIT ${numRows}
       `
-      // console.log('/schedule/:date?: sql', sql)
-      result = db.query(sql)
-    } else {
-      result = []
+}
+
+const filterLastServed = (lastServed, finalSchedule) => {
+  // eliminate from result members already in finalSchedule
+  // Convert to arrays first
+  let lastServedArr = lastServed.map((r) => r.memberId)
+  let finalScheduleArr = finalSchedule.map((r) => r.memberId)
+  return lastServedArr.filter((i) => !finalScheduleArr.includes(i))
+}
+
+const fillLastServed = (lastServed, finalSchedule) => {
+  finalSchedule.forEach((r) => {
+    if (!r.memberId) {
+      let id = lastServed.shift()
+      r.memberId = id
     }
-    return result
-  }).then((rows) => {
+  })
+  return finalSchedule
+}
+
+router.get('/schedule/:date?', function(req, res, next) {
+  let db
+  let date = checkDate(req.params.date)
+  let finalSchedule // starts as tmp, will be final when routine is done
+  let numberOfRoles
+  mysql.createConnection(connectionConfig).then((conn) => {
+    // 1.
+    db = conn
+    return conn.query(sqlGetRoles)
+  }).then((result) => {
+    // 2.
+    numberOfRoles = result.length
+    finalSchedule = makeSchedule(result)
+    return db.query(sqlGetExistingSchedule(date))
+  }).then((result) => {
+    // 3.
+    fillExistingSchedule(finalSchedule, result)
+    return db.query(sqlLastServed(numberOfRoles * 2))
+  }).then((result) => {
+    // 4.
     db.end()
-    let rid
-    if (rows.length) {
-      // loop over the unassigned roles
-      for (let i = 0; i < unassignedRoleIds.length; i++) {
-        // find a member not yet assigned to a role
-        for (let j = 0; j < rows.length; j++) {
-          if (scheduledMemberIds.indexOf(rows[j]['member_id']) < 0) {
-            // console.log('fill-in member ids:', rows)
-            // console.log('fill-in member id:', rows[i]['member_id'])
-            rid = unassignedRoleIds[i]
-            membersByRole[rid] = rows[i]['member_id']
-            scheduledMemberIds.push(rows[i]['member_id'])
-            break;
-          }
-        }
-      }
-    }
-    // let tmp = {
-    //   a: 1,
-    //   b: 2,
-    //   c: 3,
-    //   d: 4,
-    //   e: 5,
-    //   f: 6,
-    // }
-    // let tmp = {
-    //   '0': 1,
-    //   '1': 2,
-    //   '2': 3,
-    //   '3': 4,
-    //   '4': 5,
-    //   '5': 6,
-    // }
-    // console.log('tmp', tmp)
-    // console.log('schedule: ', schedule)
-    console.log('membersByRole: ', membersByRole)
-    // console.log('roleIds: ', roleIds)
-    // console.log('unassignedRoleIds: ', unassignedRoleIds)
-    // console.log('scheduleMemberIds: ', scheduledMemberIds)
-    res.send(membersByRole)
-    // res.send(tmp)
+    let lastServed = filterLastServed(result, finalSchedule)
+    res.send(fillLastServed(lastServed, finalSchedule))
+  }).catch((err) => {
+    console.warn('catch', err)
+    db.end()
   })
 })
 
