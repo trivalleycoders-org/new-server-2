@@ -79,11 +79,12 @@ const fillLastServed = (lastServed, finalSchedule) => {
   return finalSchedule
 }
 
-router.get('/schedule/:date?', function(req, res, next) {
+router.get('/:date?', function(req, res, next) {
   let db
   let date = checkDate(req.params.date)
   let finalSchedule // starts as tmp, will be final when routine is done
   let numberOfRoles
+
   mysql.createConnection(connectionConfig).then((conn) => {
     // 1.
     db = conn
@@ -108,6 +109,7 @@ router.get('/schedule/:date?', function(req, res, next) {
   })
 })
 
+// is this still used / needed
 router.get('/roles', function(req, res) {
   let sql = 'SELECT * FROM roles'
   // console.log('/roles: sql', sql)
@@ -121,50 +123,4 @@ router.get('/roles', function(req, res) {
   })
 })
 
-
-
-
 module.exports = router;
-
-
-// // not needed with new members data structure
-// router.get('/exclusions', function(req, res) {
-//   let sql = 'select * from exclusions'
-//   // console.log('/exclusions: sql', sql)
-//   mysql.createConnection(connectionConfig).then((conn) => {
-//     let result = conn.query(sql)
-//     conn.end()
-//     return result
-//   }).then((rows) => {
-//     // console.log('routes.schedule/exclusions: rows \n', rows)
-//     res.send(rows)
-//   })
-// })
-
-// router.get('/scheduleMembers', function(req, res) {
-//   // let sql = 'select (@row:=@row+1) as sequence, h.history_id, h.date, h.member_id, h.role_id, h.served, m.first_name, r.role_name '
-//   // sql += 'from history as h, members as m, roles as r, (select @row := 0) s '
-//   // sql += 'where h.member_id = m.member_id and h.role_id = r.role_id and m.exempt <> 1 '
-//   // sql += 'order by date desc '
-//   // sql += 'limit 12;'
-//
-//   let sql = `
-//     SELECT (select (@row:=@row+1) FROM (select @row := 0) s) as sequence, m.member_id, m.first_name, m.last_name, h.history_id, h.date, h.role_id, r.role_name, m.comment
-//     FROM members m
-//     LEFT JOIN history h ON h.member_id = m.member_id AND (h.date = (SELECT MAX(h1.date) FROM history h1 WHERE h1.member_id = m.member_id))
-//     LEFT JOIN roles r on r.role_id = h.role_id
-//     WHERE m.exempt = 0
-//     ORDER BY (h.history_id IS NULL) DESC, h.date ASC, m.last_name ASC
-//     LIMIT 12;
-//   `
-//   console.log('/scheduleMembers: sql', sql)
-//   // console.log('/next6: sql', sql)
-//   mysql.createConnection(connectionConfig).then((conn) => {
-//     let result = conn.query(sql)
-//     conn.end()
-//     return result
-//   }).then((rows) => {
-//     console.log('routes.schedule/scheduleMembers: rows \n', rows)
-//     res.send(rows)
-//   })
-// })
