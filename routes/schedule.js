@@ -44,10 +44,17 @@ const checkDate = (date) => {
   return retDate
 }
 
-const sqlGetRoles = "SELECT role_id AS roleId, role_name AS roleName FROM roles"
+const sqlGetRoles = `
+                     SELECT role_id AS roleId, role_name AS roleName 
+                     FROM roles
+                    `
 
 const sqlGetExistingSchedule = (date) => {
-  return `SELECT member_id AS memberId, role_id AS roleId, date FROM history WHERE date = '${date}'` // '2017-12-25'
+  return `
+          SELECT member_id AS memberId, role_id AS roleId, date 
+          FROM history 
+          WHERE date = '${date}'
+         ` // e.g., '2017-12-25'
 }
 
 const sqlLastServed = (numRows) => {
