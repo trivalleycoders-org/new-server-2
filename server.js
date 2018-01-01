@@ -1,7 +1,7 @@
 import SourceMapSupport from 'source-map-support';
 SourceMapSupport.install();
-import bodyParser from 'body-parser'
 import express from 'express'
+import bodyParser from 'body-parser'
 import path from 'path'
 import { db } from './db'
 // import member from './routes/members'
@@ -17,8 +17,6 @@ global.connectionConfig = {
     password : process.env.DB_PASS,
     database : process.env.DB_NAME,
 }
-
-
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: false}))
