@@ -3,29 +3,44 @@ import express from 'express'
 import mysql from 'promise-mysql'
 const router = express.Router();
 
-// create
+
+/*
+    Create new user
+    'post' will only be used to create a new blank user with member_id.
+    returns member_id
+ */
 router.post('/', function(req, res) {
-  const m = req.body.member
-  // console.log('updated member in:', m)
-  const newMember = {
-    first_name: m.firstName,
-    last_name: m.lastName,
-    email: m.email,
-    exempt: m.exempt,
-    comment: m.comment,
-    phone_number: m.phoneNumber,
-    active: m.active,
-  }
-  // console.log('updated member reformatted:', updatedMember)
   // the following "placeholder" syntax is explained here: https://www.w3resource.com/node.js/nodejs-mysql.php#Escaping_query
-  let sql = "INSERT INTO members SET ?";
+  // let sql = "INSERT INTO members SET ?";
+  let sql = "INSERT INTO `members` (`member_id`, `status`) VALUES (NULL, 'new')";
   mysql.createConnection(connectionConfig).then((conn) => {
-    let result = conn.query(sql, newMember);
+    let result = conn.query(sql);
     conn.end()
     return result
   }).then((rows) => {
+    // console.log('rows', typeof rows)
+    // for (var property in rows) {
+    //   if (rows.hasOwnProperty(property)) {
+    //     console.log(property)
+    //   }
+    // }
     // console.log('rows', rows)
-    res.send(rows)
+    // console.log('rows.insertId', rows.insertId)
+    // create a member
+    let member = {
+      id: rows.insertId,
+      firstName: '',
+      lastName: '',
+      email: '',
+      exempt: 0,
+      comment: '',
+      phoneNumber: '',
+      active: 1,
+      status: 'edit',
+    }
+    res.send(member)
+  }).catch((err) => {
+    console.log('route members post /', err)
   })
 })
 
