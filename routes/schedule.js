@@ -23,7 +23,7 @@ const fillExistingSchedule = (schedule, existingSchedule) => {
     let x = existingSchedule.filter((r) => {
       return r.roleId === role.roleId
     })
-    if (x.length !== 0) { 
+    if (x.length !== 0) {
       role.memberId = x[0].memberId
     }
   })
@@ -45,14 +45,14 @@ const checkDate = (date) => {
 }
 
 const sqlGetRoles = `
-                     SELECT role_id AS roleId, role_name AS roleName 
+                     SELECT role_id AS roleId, role_name AS roleName
                      FROM roles
                     `
 
 const sqlGetExistingSchedule = (date) => {
   return `
-          SELECT member_id AS memberId, role_id AS roleId, date 
-          FROM history 
+          SELECT member_id AS memberId, role_id AS roleId, date
+          FROM history
           WHERE date = '${date}'
          ` // e.g., '2017-12-25'
 }
@@ -116,7 +116,7 @@ router.get('/:date?', function(req, res, next) {
   })
 })
 
-// is this still used / needed
+// is this still used  / needed - YES
 router.get('/roles', function(req, res) {
   let sql = 'SELECT * FROM roles'
   // console.log('/roles: sql', sql)

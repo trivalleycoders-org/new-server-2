@@ -123,29 +123,49 @@ router.get('/', function(req, res) {
   })
 })
 
-// update (handles member information updates, active/inactive swtiching)
+const logError = (err) => {
+  const message = `{
+    ERROR: query failed
+    code: ${err.code},
+    errno: ${err.errno},
+    sqlMessage: ${err.sqlMessage},
+    sqlState: ${err.sqlSTate},
+    index: ${err.index},
+    sql: ${err.sql},
+  }`
+  console.log('ERROR', message)
+  return message
+}
+// update existing member (handles member information updates, active/inactive swtiching)
 router.put('/:id', function(req, res) {
   const m = req.body.member
-  console.log('updated member in:', m)
+  // console.log('updated member in:', m)
   const updatedMember = {
-    first_name: m.firstName,
-    last_name: m.lastName,
+    active: m.active,
+    comment: m.comment,
     email: m.email,
     exempt: m.exempt,
-    comment: m.comment,
+    first_name: m.firstName,
+    last_name: m.lastName,
     phone_number: m.phoneNumber,
-    active: m.active,
+    status: 'saved',
   }
-  console.log('updated member reformatted:', updatedMember)
+  // console.log('updated member reformatted:', updatedMember)
   // the following "placeholder" syntax is explained here: https://www.w3resource.com/node.js/nodejs-mysql.php#Escaping_query
   let sql = "UPDATE members SET ? WHERE member_id = ?";
+  let db
   mysql.createConnection(connectionConfig).then((conn) => {
+    db = conn
     let result = conn.query(sql, [updatedMember, req.params.id])
     conn.end()
     return result
   }).then((rows) => {
-    // console.log('rows', rows)
+    console.clear()
+    console.log('rows', rows)
     res.send(rows)
+  }).catch((err) => {
+    // res.send(logError(err))
+    res.status(400).end('error')
   })
 })
 
