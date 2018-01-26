@@ -3,7 +3,7 @@ SourceMapSupport.install();
 import express from 'express'
 import bodyParser from 'body-parser'
 import path from 'path'
-import { db } from './db'
+// import { db } from './db'
 // import member from './routes/members'
 import members from './routes/members'
 import schedule from './routes/schedule'
